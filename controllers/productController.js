@@ -78,7 +78,7 @@ exports.deleteProduct = asyncHandler(async (req, res) => {
         if (!product) {
             res.status(404).json(new ApiError(404, 'Product not found'));
         }
-        
+
         return res.status(200).json(new ApiResponse(200, 'Product deleted successfully'));
     } catch (error) {
         console.log("errorrrr", error)

@@ -1,9 +1,10 @@
 const mongoose = require('mongoose')
-mongoose.set('strictQuery', true);
+// mongoose.set('strictQuery', true);
+const config = require('./config')
 
 const connectDB = async () => {
 
-    await mongoose.connect('mongodb://localhost:27017/task18').then(() => {
+    await mongoose.connect(config.DB_URL).then(() => {
         console.log('Connected to MongoDB');
     })
 }

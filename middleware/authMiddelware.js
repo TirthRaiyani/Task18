@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const ApiError = require('../utils/apiError')
 const User = require('../models/userModel');
+const config = require('../config/config')
 
 const authenticate = async (req, res, next) => {
     const token = req.headers[ 'authorization' ];
@@ -40,8 +41,30 @@ const authenticate = async (req, res, next) => {
     });
 };
 
+
+const verifyJWT = (async (req, res, next) => {
+    let token;
+    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+        try {
+            token = req.headers.authorization.split(' ')[ 1 ];
+            const decoded = jwt.verify(token, config.SECRET_KEY);
+            const user = await User.findById(decoded?._id).select('-password -refreshToken')
+            if (!user) {
+                throw new ApiError(404, 'Invalid access token!')
+            }
+            req.user = user
+            next()
+        }
+        catch (error) {
+            console.log(error)
+            throw new ApiError(401, 'Invalid access token!')
+        }
+    }
+})
+
 module.exports = {
     authenticate,
+    verifyJWT
 };
 
 
