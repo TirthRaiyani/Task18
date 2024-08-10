@@ -28,17 +28,10 @@ const loginSchema = Joi.object({
     password: Joi.string().required(),
 });
 
-const createblog = Joi.object({
-    titel: Joi.string().required(),
-    description: Joi.string().required(),
-    author: Joi.string().required(),
-    state: Joi.required()
-})
 module.exports = {
     validateRequest,
     registerSchema,
     loginSchema,
-    createblog,
     CP
 };
 

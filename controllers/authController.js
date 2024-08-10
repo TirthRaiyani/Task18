@@ -2,7 +2,6 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('../models/userModel');
 const ApiError = require('../utils/apiError');
-const asyncHandler = require('../utils/asyncHandler');
 
 exports.registerUser = async (req, res) => {
     try {
@@ -22,7 +21,7 @@ exports.registerUser = async (req, res) => {
         if (isAdmin === 1) {
             userRole = 'admin';
         } else if (isAdmin === 2) {
-            userRole = 'user';
+            userRole = 'manager';
         } else {
             return res.status(400).json(new ApiError(400, null, "Invalid role specified"));
         }

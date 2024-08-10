@@ -4,41 +4,63 @@ const User = require('../models/userModel');
 const config = require('../config/config')
 
 const authenticate = async (req, res, next) => {
-    const token = req.headers[ 'authorization' ];
-    if (!token) {
-        return res.json({
-            statuscode: 403,
+    try {
+        const authHeader = req.headers[ 'authorization' ];
+        if (!authHeader) {
+            return res.status(403).json({
+                statuscode: 403,
+                success: false,
+                error: true,
+                message: "No Token Provided"
+            });
+        }
+
+        const token = authHeader.split(" ")[ 1 ];
+        if (!token) {
+            return res.status(403).json({
+                statuscode: 403,
+                success: false,
+                error: true,
+                message: "Invalid Token Format"
+            });
+        }
+
+        jwt.verify(token, config.SECRET_KEY, async (err, decoded) => {
+            if (err) {
+                return res.status(403).json({
+                    statuscode: 403,
+                    success: false,
+                    error: true,
+                    message: "Unauthorized"
+                });
+            }
+
+            if (decoded.role === 1) {
+                req.user = await User.findOne({
+                     isAdmin: 'admin'
+                });
+            }
+
+            if (!req.user) {
+                return res.status(403).json({
+                    statuscode: 403,
+                    success: false,
+                    error: true,
+                    message: "Forbidden: You don't have permission to perform this action."
+                });
+            }
+
+            next();
+        });
+    } catch (error) {
+        return res.status(500).json({
+            statuscode: 500,
             success: false,
             error: true,
-            message: "No Token Provided"
+            message: "Internal Server Error",
+            details: error.message
         });
     }
-    jwt.verify(token.split(" ")[ 1 ], process.env.SECRET_KEY, async (err, decoded) => {
-        if (err) {
-            return res.json({
-                statuscode: 403,
-                success: false,
-                error: true,
-                message: "Unauthorized"
-            });
-        }
-        if (decoded.role === 1) { 
-            req.user = await User.findOne({
-                where: { id: decoded._id, isAdmin: 'admin' },
-                raw: true,
-                nest: true,
-            });
-        }
-        if (!req.user) {
-            return res.json({
-                statuscode: 403,
-                success: false,
-                error: true,
-                message: "Forbidden: You don't have permission to perform this action."
-            });
-        }
-        next();
-    });
 };
 
 
@@ -67,49 +89,3 @@ module.exports = {
     verifyJWT
 };
 
-
-// const jwt = require('jsonwebtoken');
-// const ApiError = require('../utils/apiError')
-
-// const authenticate = async(req, res, next) => {
-//     const token = req.headers[ 'authorization' ];
-//     if (!token) {
-        // return res.json({statuscode:403,
-        //                 success:false,
-        //                 error:true,
-        //                 message:"No Token Provided"});
-//     }
-//     jwt.verify(token.split(" ")[ 1 ], process.env.SECRET_KEY, (err, decoded) => {
-        // if (err) {
-            // return res.json({
-            //     statuscode: 403,
-            //     success: false,
-            //     error: true,
-            //     message: "Unauthorized"
-            // });
-//      }
-  
-//         req.userId = decoded._id;
-//         req.isAdmin = decoded.isAdmin;
-//         next();
-//     });
-// };
-
-// const isAdmin = (req, res, next) => {
-//     if (!req.isAdmin) {
-
-        // return res.json({
-        //     statuscode: 403,
-        //     success: false,
-        //     error: true,
-        //     message: "Forbidden: You don't have permission to perform this action."
-        // });
-       
-//     }
-//     next();
-// };
-
-// module.exports = {
-//     authenticate,
-//     isAdmin
-// }

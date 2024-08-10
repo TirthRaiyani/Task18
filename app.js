@@ -3,6 +3,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const productRoutes = require('./routes/productRoutes');
 const authRouters = require('./routes/authRoutes');
+const categoryRouters = require('./routes/categoriesRoutes')
 const connectDB = require('./config/db')
 const { config } = require('dotenv');
 
@@ -12,6 +13,7 @@ const PORT = config.PORT || 3000;
 app.use(bodyParser.json());
 app.use('/api', productRoutes);
 app.use('/api', authRouters);
+app.use('/api', categoryRouters)
 connectDB()
 
     .then(() => {
