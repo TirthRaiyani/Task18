@@ -6,7 +6,7 @@ const Log = require('../models/logModel')
 exports.createProduct = async (req, res) => {
     try {
         const { name, description, price, stock, categoryId } = req.body;
-        const images = req.files && req.files[ 'image' ] ? req.files[ 'image' ].map(file => file.path) : [];
+        const images = req.files && req.files[ 'images' ] ? req.files[ 'images' ].map(file => file.path) : [];
 
         const product = new Product({
             name,
@@ -32,43 +32,6 @@ exports.createProduct = async (req, res) => {
     }
 };
 
-
-
-// exports.getAllProducts = (async (req, res) => {
-//     try {
-//         const page = parseInt(req.query.page) || 1;
-//         const limit = parseInt(req.query.limit) || 10;
-//         const skip = (page - 1) * limit;
-
-//         const searchQuery = req.query.search || '';
-//         const sortField = req.query.sortBy || 'price';
-//         const sortOrder = req.query.order === 'desc' ? -1 : 1;
-
-//         const products = await Product.find({
-//             name: { $regex: searchQuery, $options: 'i' }
-//         })
-//             .sort({ [ sortField ]: sortOrder })
-//             .skip(skip)
-//             .limit(limit)
-//             .populate('categoryId')
-
-//         if (!products.length) {
-//             throw new ApiError(404, 'No product found');
-//         }
-//         await Log.create({
-//             userId: req.user._id,
-//             operation: 'READ',
-//             model: 'Product',
-//             documentId: products._id,
-//             changes: products.toObject()
-//         })
-
-//         res.status(200).json(new ApiResponse(200, products, 'Products fetched successfully'));
-//     } catch (error) {
-//         console.error(error);
-//         return res.status(500).json(new ApiError(500, "Something went wrong while fetching products"));
-//     }
-// });
 
 exports.getAllProducts = async (req, res) => {
     try {
